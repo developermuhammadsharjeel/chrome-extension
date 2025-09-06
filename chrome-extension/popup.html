@@ -2,11 +2,14 @@
 <html>
 <head>
   <title>ScreenBlur</title>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'">
   <style>
     body {
       width: 300px;
       padding: 15px;
       font-family: Arial, sans-serif;
+      margin: 0;
     }
     
     h1 {
@@ -24,6 +27,7 @@
       border-radius: 4px;
       cursor: pointer;
       font-weight: bold;
+      transition: background-color 0.2s;
     }
     
     button:hover {
@@ -52,10 +56,17 @@
       color: #5f6368;
     }
     
+    .error {
+      background-color: #fce8e6;
+      color: #d93025;
+    }
+    
     .instructions {
       font-size: 12px;
       color: #5f6368;
       margin-top: 10px;
+      border-top: 1px solid #eee;
+      padding-top: 10px;
     }
   </style>
 </head>
@@ -64,7 +75,6 @@
   
   <button id="toggleBlur">Start Blur Selection</button>
   <button id="clearAll" disabled>Clear All Blurs</button>
-  <button id="editBlurs" disabled>Edit Blur Areas</button>
   
   <div id="status" class="status inactive">
     Blur mode inactive
@@ -74,8 +84,9 @@
     <p><strong>How to use:</strong></p>
     <ol>
       <li>Click "Start Blur Selection"</li>
-      <li>Click and drag to select areas to blur</li>
-      <li>Use "Edit Blur Areas" to adjust existing blurs</li>
+      <li>Click and drag to select an area to blur</li>
+      <li>Selection will automatically stop after each area</li>
+      <li>Click "Start Blur Selection" again for more areas</li>
       <li>Use "Clear All Blurs" to remove all blurred areas</li>
     </ol>
   </div>
