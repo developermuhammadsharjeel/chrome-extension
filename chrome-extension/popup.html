@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ScreenBlur</title>
+  <style>
+    body {
+      width: 300px;
+      padding: 15px;
+      font-family: Arial, sans-serif;
+    }
+    
+    h1 {
+      font-size: 18px;
+      margin-top: 0;
+    }
+    
+    button {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      background-color: #4285f4;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    
+    button:hover {
+      background-color: #2b71d9;
+    }
+    
+    button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+    
+    .status {
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 4px;
+      text-align: center;
+    }
+    
+    .active {
+      background-color: #e6f4ea;
+      color: #137333;
+    }
+    
+    .inactive {
+      background-color: #f8f9fa;
+      color: #5f6368;
+    }
+    
+    .instructions {
+      font-size: 12px;
+      color: #5f6368;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>ScreenBlur: Privacy Tool</h1>
+  
+  <button id="toggleBlur">Start Blur Selection</button>
+  <button id="clearAll" disabled>Clear All Blurs</button>
+  <button id="editBlurs" disabled>Edit Blur Areas</button>
+  
+  <div id="status" class="status inactive">
+    Blur mode inactive
+  </div>
+  
+  <div class="instructions">
+    <p><strong>How to use:</strong></p>
+    <ol>
+      <li>Click "Start Blur Selection"</li>
+      <li>Click and drag to select areas to blur</li>
+      <li>Use "Edit Blur Areas" to adjust existing blurs</li>
+      <li>Use "Clear All Blurs" to remove all blurred areas</li>
+    </ol>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>
