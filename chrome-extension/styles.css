@@ -6,6 +6,7 @@
   height: 100%;
   z-index: 2147483646; /* Very high z-index */
   pointer-events: none;
+  overflow: hidden;
 }
 
 #privacy-blur-selection {
@@ -22,72 +23,6 @@
   -webkit-backdrop-filter: blur(10px);
   background-color: rgba(0, 0, 0, 0.1);
   pointer-events: none;
-}
-
-.privacy-blur-area.editable {
-  pointer-events: all;
-  cursor: move;
-  border: 1px dashed rgba(0, 121, 255, 0.8);
-}
-
-.blur-handle {
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  background-color: white;
-  border: 1px solid rgb(0, 121, 255);
-  border-radius: 50%;
-  pointer-events: all;
-}
-
-.blur-handle-nw {
-  top: -5px;
-  left: -5px;
-  cursor: nw-resize;
-}
-
-.blur-handle-ne {
-  top: -5px;
-  right: -5px;
-  cursor: ne-resize;
-}
-
-.blur-handle-sw {
-  bottom: -5px;
-  left: -5px;
-  cursor: sw-resize;
-}
-
-.blur-handle-se {
-  bottom: -5px;
-  right: -5px;
-  cursor: se-resize;
-}
-
-.blur-handle-n {
-  top: -5px;
-  left: 50%;
-  transform: translateX(-50%);
-  cursor: n-resize;
-}
-
-.blur-handle-s {
-  bottom: -5px;
-  left: 50%;
-  transform: translateX(-50%);
-  cursor: s-resize;
-}
-
-.blur-handle-e {
-  right: -5px;
-  top: 50%;
-  transform: translateY(-50%);
-  cursor: e-resize;
-}
-
-.blur-handle-w {
-  left: -5px;
-  top: 50%;
-  transform: translateY(-50%);
-  cursor: w-resize;
+  border-radius: 3px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
