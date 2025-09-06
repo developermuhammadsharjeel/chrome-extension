@@ -18,9 +18,32 @@ document.addEventListener('DOMContentLoaded', function() {
     blurActive = !blurActive;
     
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-      chrome.tabs.sendMessage(tabs[0].id, {
-        action: blurActive ? 'startBlurSelection' : 'stopBlurSelection'
-      });
+      if (tabs && tabs[0] && tabs[0].id) {
+        // Check if we can send a message to this tab
+        chrome.tabs.sendMessage(tabs[0].id, {action: "ping"}, function(response) {
+          if (chrome.runtime.lastError) {
+            // Content script not loaded yet, inject it
+            chrome.scripting.executeScript({
+              target: {tabId: tabs[0].id},
+              files: ['content.js']
+            }, function() {
+              // Now send the actual message
+              chrome.tabs.sendMessage(tabs[0].id, {
+                action: blurActive ? 'startBlurSelection' : 'stopBlurSelection'
+              });
+            });
+          } else {
+            // Content script is already there, send message directly
+            chrome.tabs.sendMessage(tabs[0].id, {
+              action: blurActive ? 'startBlurSelection' : 'stopBlurSelection'
+            });
+          }
+        });
+      } else {
+        console.error("No active tab found");
+        statusDiv.textContent = "Error: Cannot access this page";
+        statusDiv.classList.add("error");
+      }
     });
     
     chrome.storage.local.set({blurActive: blurActive});
@@ -29,7 +52,13 @@ document.addEventListener('DOMContentLoaded', function() {
   
   clearAllBtn.addEventListener('click', function() {
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-      chrome.tabs.sendMessage(tabs[0].id, {action: 'clearAllBlurs'});
+      if (tabs && tabs[0] && tabs[0].id) {
+        chrome.tabs.sendMessage(tabs[0].id, {action: 'clearAllBlurs'}, function(response) {
+          if (chrome.runtime.lastError) {
+            console.log("Error sending message: ", chrome.runtime.lastError);
+          }
+        });
+      }
     });
     
     chrome.storage.local.set({hasBlurAreas: false});
@@ -38,7 +67,13 @@ document.addEventListener('DOMContentLoaded', function() {
   
   editBlursBtn.addEventListener('click', function() {
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-      chrome.tabs.sendMessage(tabs[0].id, {action: 'editBlurAreas'});
+      if (tabs && tabs[0] && tabs[0].id) {
+        chrome.tabs.sendMessage(tabs[0].id, {action: 'editBlurAreas'}, function(response) {
+          if (chrome.runtime.lastError) {
+            console.log("Error sending message: ", chrome.runtime.lastError);
+          }
+        });
+      }
     });
   });
   
