@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Privacy_Blur_screen</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <main>
+    <h1 id="title" tabindex="0">Privacy_Blur_screen</h1>
+    <div id="actions">
+      <button id="select-blur" aria-label="Select area to blur" title="Draw a rectangle on the page to blur that region" tabindex="0">
+        Select Blur Area
+      </button>
+      <button id="remove-all" aria-label="Remove all blur overlays" title="Remove every active blurred area" tabindex="0">
+        Remove All Blurred_Area
+      </button>
+    </div>
+    <details id="settings">
+      <summary>Settings</summary>
+      <label>
+        <input type="checkbox" id="persist-overlays">
+        Persist overlays on page reload
+      </label>
+      <label>
+        Default blur radius:
+        <input type="range" id="blur-radius" min="4" max="24" value="8">
+        <span id="blur-value">8px</span>
+      </label>
+      <label>
+        Max overlays:
+        <input type="number" id="max-overlays" min="1" max="50" value="20" style="width:3em;">
+      </label>
+    </details>
+    <div id="status" aria-live="polite"></div>
+    <footer>
+      <small>Alt+Shift+B: Quick toggle selection</small>
+    </footer>
+  </main>
+  <script src="popup.js"></script>
+</body>
+</html>
