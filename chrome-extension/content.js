@@ -1,3 +1,28 @@
+
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+  if (request.action === "ping") {
+    sendResponse({status: "ok"});
+    return true;
+  }
+  
+  switch(request.action) {
+    case 'startBlurSelection':
+      startBlurSelection();
+      break;
+    case 'stopBlurSelection':
+      stopBlurSelection();
+      break;
+    case 'clearAllBlurs':
+      clearAllBlurs();
+      break;
+    case 'editBlurAreas':
+      toggleEditMode();
+      break;
+  }
+  
+  return true;
+});
+
 // Store blur areas
 let blurAreas = [];
 let isSelecting = false;
