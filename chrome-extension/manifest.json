@@ -3,7 +3,8 @@
   "name": "ScreenBlur: Privacy Screen Blur",
   "version": "1.0",
   "description": "Blur sensitive areas of your screen for privacy during video calls or screenshots",
-  "permissions": ["activeTab", "storage"],
+  "permissions": ["activeTab", "storage", "scripting"],
+  "host_permissions": ["<all_urls>"],
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
