@@ -11,8 +11,8 @@
   let tooltip = null;
   let startPoint = null;
   let blurRadius = 8;
-  let blurColor = "rgba(255,255,255,0.13)";
-  let blurDensity = 13;
+  let blurColor = "rgba(255,255,255,0.30)";
+  let blurDensity = 30;
   let persistOverlays = false;
   let ariaLiveDiv = null;
   let toastTimeout = null;
@@ -46,7 +46,7 @@
   }
 
   // Convert hex color to rgba
-  function hexToRgba(hex, alpha = 13) {
+  function hexToRgba(hex, alpha = 30) {
     // Remove # if present
     hex = hex.replace('#', '');
     
@@ -55,13 +55,21 @@
       hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
     }
     
+    // Validate hex length
+    if (hex.length !== 6) {
+      console.warn('Invalid hex color, using default white');
+      hex = 'ffffff';
+    }
+    
     // Extract RGB components
     const r = parseInt(hex.substring(0, 2), 16);
     const g = parseInt(hex.substring(2, 4), 16);
     const b = parseInt(hex.substring(4, 6), 16);
     
-    // Use the alpha/100 to get decimal
-    return `rgba(${r}, ${g}, ${b}, ${alpha/100})`;
+    // Ensure alpha is a valid number and convert to decimal
+    const alphaValue = Math.max(0, Math.min(100, alpha || 30)) / 100;
+    
+    return `rgba(${r}, ${g}, ${b}, ${alphaValue})`;
   }
 
   // Load settings
@@ -73,19 +81,20 @@
         'privacy_blur_persist'
       ]);
       
-      blurDensity = prefs.privacy_blur_density || 13;
+      // Update density first
+      blurDensity = prefs.privacy_blur_density || 30;
       
-      if (prefs.privacy_blur_color) {
-        const hexColor = prefs.privacy_blur_color;
-        blurColor = hexToRgba(hexColor, blurDensity);
-      } else {
-        blurColor = hexToRgba('#ffffff', blurDensity);
-      }
+      // Then calculate color with the correct density
+      const hexColor = prefs.privacy_blur_color || '#ffffff';
+      blurColor = hexToRgba(hexColor, blurDensity);
       
       persistOverlays = !!prefs.privacy_blur_persist;
+      
+      console.log('Settings loaded:', { hexColor, blurDensity, blurColor, persistOverlays });
     } catch (err) {
-      blurColor = "rgba(255,255,255,0.13)";
-      blurDensity = 13;
+      console.error('Failed to load preferences:', err);
+      blurColor = "rgba(255,255,255,0.30)";
+      blurDensity = 30;
       persistOverlays = false;
     }
   }
@@ -164,6 +173,15 @@
   function updateOverlaysStyle() {
     overlays.forEach(overlay => {
       if (overlay.el && overlay.type === 'backdrop-filter') {
+        // Recalculate color with current settings
+        overlay.el.style.background = blurColor;
+        overlay.color = blurColor;
+      } else if (overlay.el && overlay.type === 'snapshot') {
+        // For snapshot overlays, update the background color
+        overlay.el.style.background = blurColor;
+        overlay.color = blurColor;
+      } else if (overlay.el && overlay.type === 'unavailable') {
+        // For unavailable overlays, update the background color
         overlay.el.style.background = blurColor;
         overlay.color = blurColor;
       }
@@ -524,18 +542,16 @@
     if (namespace === 'local') {
       let needsUpdate = false;
       
-      if (changes.privacy_blur_color) {
-        needsUpdate = true;
-      }
-      
-      if (changes.privacy_blur_density) {
-        blurDensity = changes.privacy_blur_density.newValue || 13;
+      if (changes.privacy_blur_color || changes.privacy_blur_density) {
         needsUpdate = true;
       }
       
       if (needsUpdate) {
         loadPrefs().then(() => {
           updateOverlaysStyle();
+          console.log('Settings updated from storage change:', { blurColor, blurDensity });
+        }).catch(err => {
+          console.error('Failed to update settings from storage change:', err);
         });
       }
     }

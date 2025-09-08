@@ -23,7 +23,7 @@ chrome.commands.onCommand.addListener(async (command) => {
 chrome.runtime.onInstalled.addListener(() => {
   chrome.storage.local.set({
     privacy_blur_color: '#ffffff',
-    privacy_blur_density: 13,
+    privacy_blur_density: 30,
     privacy_blur_persist: false
   });
 });
