@@ -1,0 +1,12 @@
+privacy-blur-extension/
+├── manifest.json
+├── popup.html
+├── popup.js
+├── content.js
+├── background.js
+├── styles.css
+└── icons/
+    ├── icon16.png
+    ├── icon48.png
+    ├── icon128.png
+    └── blur-cursor.png
