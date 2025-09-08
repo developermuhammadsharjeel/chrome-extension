@@ -1,9 +1,5 @@
-// Handles in-page selection, overlay creation, removal, fallback, accessibility, error handling
-// IMPROVED: Blur overlays are pointer-events: none (click-through), close button is pointer-events: auto and always clickable.
-// UPDATE: Overlays never block interaction; try to run on more sites. Security check relaxed.
-
 (function() {
-  // Shadow DOM root for overlays
+
   let shadowHost = null, shadowRoot = null;
   let overlays = [];
   let selectionActive = false;
@@ -17,7 +13,7 @@
   let ariaLiveDiv = null;
   let toastTimeout = null;
 
-  // Utility: ARIA live region
+ 
   function announce(msg, timeout = 2500) {
     if (!ariaLiveDiv) {
       ariaLiveDiv = document.createElement('div');
@@ -45,26 +41,25 @@
     }, timeout);
   }
 
-  // Convert hex color to rgba
   function hexToRgba(hex, alpha = 13) {
-    // Remove # if present
+
     hex = hex.replace('#', '');
     
-    // Convert 3-digit hex to 6-digit
+  
     if (hex.length === 3) {
       hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
     }
     
-    // Extract RGB components
+
     const r = parseInt(hex.substring(0, 2), 16);
     const g = parseInt(hex.substring(2, 4), 16);
     const b = parseInt(hex.substring(4, 6), 16);
     
-    // Use the alpha/100 to get decimal
+
     return `rgba(${r}, ${g}, ${b}, ${alpha/100})`;
   }
 
-  // Load settings
+
   async function loadPrefs() {
     try {
       const prefs = await chrome.storage.local.get([
@@ -90,7 +85,7 @@
     }
   }
 
-  // Create Shadow DOM host for overlays, if not exists
+
   function ensureShadowHost() {
     if (!shadowHost || !document.body.contains(shadowHost)) {
       shadowHost = document.createElement('div');
@@ -101,14 +96,14 @@
       shadowHost.style.width = '100vw';
       shadowHost.style.height = '100vh';
       shadowHost.style.zIndex = '2147483646';
-      shadowHost.style.pointerEvents = 'none'; // overlays never block input
+      shadowHost.style.pointerEvents = 'none'; 
       shadowHost.style.userSelect = 'none';
       shadowRoot = shadowHost.attachShadow({mode: 'open'});
       document.body.appendChild(shadowHost);
     }
   }
 
-  // Remove all overlays
+
   function removeAllOverlays() {
     if (shadowRoot) {
       shadowRoot.innerHTML = '';
@@ -118,7 +113,7 @@
     saveOverlays();
   }
 
-  // Remove a single overlay
+
   function removeOverlay(idx, animate = true) {
     const overlay = overlays[idx];
     if (!overlay) return;
@@ -137,17 +132,16 @@
     }
   }
 
-  // Save overlays for persistence
+ 
   function saveOverlays() {
     if (!persistOverlays) return;
-    // Store overlays as simple array of positions and type
+ 
     const data = overlays.map(o => ({
       left: o.left, top: o.top, width: o.width, height: o.height, type: o.type, color: o.color
     }));
     chrome.storage.local.set({privacy_blur_overlays: data});
   }
 
-  // Restore overlays (if enabled and persisted)
   async function restoreOverlays() {
     if (!persistOverlays) return;
     try {
@@ -160,7 +154,6 @@
     } catch (err) {}
   }
 
-  // Update existing overlays with new color/density
   function updateOverlaysStyle() {
     overlays.forEach(overlay => {
       if (overlay.el && overlay.type === 'backdrop-filter') {
@@ -171,25 +164,20 @@
     saveOverlays();
   }
 
-  // Create the blur overlay (main method)
   async function createBlurOverlay(left, top, width, height, type = 'auto', restoring = false, overlayColor = null) {
     ensureShadowHost();
 
-    // Default to 20 overlays max
     if (overlays.length >= 20) {
       announce("Overlay limit reached (20). Remove some overlays.", 3000);
       return;
     }
 
-    // Use provided color or default
     const useColor = overlayColor || blurColor;
 
-    // Detect backdrop-filter support
     let blurSupported = CSS.supports('backdrop-filter', 'blur(1px)') || CSS.supports('-webkit-backdrop-filter', 'blur(1px)');
     let useFallback = false;
     let overlayType = 'backdrop-filter';
 
-    // If fallback needed (e.g., restoring from storage)
     if (type !== 'auto') {
       overlayType = type;
       blurSupported = (type === 'backdrop-filter');
@@ -198,7 +186,6 @@
       useFallback = !blurSupported;
     }
 
-    // Overlay element
     const overlay = document.createElement('div');
     overlay.setAttribute('tabindex', '0');
     overlay.setAttribute('role', 'region');
@@ -213,25 +200,25 @@
     overlay.style.boxShadow = '0 4px 32px rgba(0,0,0,0.14)';
     overlay.style.border = '1.5px solid rgba(255,255,255,0.06)';
     overlay.style.overflow = 'hidden';
-    overlay.style.pointerEvents = 'none'; // <--- ALWAYS click-through!
+    overlay.style.pointerEvents = 'none'; 
     overlay.style.transition = 'opacity 0.22s, transform 0.22s';
     overlay.style.opacity = '0';
     overlay.style.transform = 'scale(0.85)';
 
-    // Respect reduced motion
+    
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReducedMotion) overlay.style.transition = 'none';
 
-    // Blur styling
+
     if (!useFallback) {
       overlay.style.backdropFilter = `blur(${blurRadius}px)`;
       overlay.style.webkitBackdropFilter = `blur(${blurRadius}px)`;
       overlay.style.background = useColor;
     } else {
-      // Fallback: html2canvas snapshot
+
       try {
         announce("Creating snapshot blur (fallback)...", 1800);
-        // Load html2canvas from extension
+  
         const loadScript = () => new Promise((resolve, reject) => {
           if (window.html2canvas) return resolve();
           const script = document.createElement('script');
@@ -242,7 +229,6 @@
         });
         await loadScript();
 
-        // Snapshot area
         const canvas = await window.html2canvas(document.body, {
           x: left,
           y: top,
@@ -260,12 +246,12 @@
         img.style.height = '100%';
         img.style.objectFit = 'cover';
         img.style.filter = `blur(${blurRadius}px)`;
-        img.style.pointerEvents = 'none'; // <--- also click-through!
+        img.style.pointerEvents = 'none'; 
         overlay.appendChild(img);
         overlay.style.background = useColor;
         overlayType = 'snapshot';
       } catch (err) {
-        // Final fallback: semi-transparent overlay
+     
         overlay.style.background = useColor;
         overlay.innerHTML = `<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
           color:#fff;font-size:1em;text-align:center;">
@@ -287,7 +273,7 @@
       }
     }
 
-    // Close button (SVG, 28x28, accessible)
+    
     const closeBtn = document.createElement('button');
     closeBtn.setAttribute('aria-label', 'Remove this blurred area');
     closeBtn.setAttribute('tabindex', '0');
@@ -306,8 +292,8 @@
     closeBtn.style.boxShadow = '0 1px 7px rgba(0,0,0,0.12)';
     closeBtn.style.transition = 'background 0.13s, transform 0.13s';
     closeBtn.style.outline = 'none';
-    closeBtn.style.pointerEvents = 'auto'; // <--- THIS REMAINS CLICKABLE!
-    closeBtn.style.zIndex = '2147483648'; // ensure it's above overlay
+    closeBtn.style.pointerEvents = 'auto'; 
+    closeBtn.style.zIndex = '2147483648'; 
 
     closeBtn.innerHTML = `
     <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
@@ -328,13 +314,11 @@
 
     overlay.appendChild(closeBtn);
 
-    // Entrance animation
     setTimeout(() => {
       overlay.style.opacity = '1';
       overlay.style.transform = 'scale(1)';
     }, 10);
 
-    // Keyboard accessibility: Escape closes overlay
     overlay.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         const idx = overlays.findIndex(o => o.el === overlay);
@@ -354,14 +338,14 @@
     saveOverlays();
   }
 
-  // Selection overlay logic
+
   function startSelectionMode() {
     if (selectionActive) return;
     selectionActive = true;
 
     ensureShadowHost();
 
-    // Fullscreen overlay
+ 
     selectionOverlay = document.createElement('div');
     selectionOverlay.setAttribute('id', 'privacy-blur-selection-overlay');
     selectionOverlay.style.position = 'fixed';
@@ -375,7 +359,7 @@
     selectionOverlay.style.pointerEvents = 'auto';
     selectionOverlay.style.userSelect = 'none';
 
-    // Tooltip
+   
     tooltip = document.createElement('div');
     tooltip.setAttribute('id', 'privacy-blur-tooltip');
     tooltip.style.position = 'fixed';
@@ -398,7 +382,7 @@
     let rect = null;
     let dragRect = null;
 
-    // Mouse events
+ 
     function onMouseDown(e) {
       if (e.button !== 0) return;
       startPoint = {x: e.clientX, y: e.clientY};
@@ -456,7 +440,7 @@
 
     function onKeyDown(e) {
       if (e.key === 'Escape') {
-        // Cancel selection mode
+    
         announce("Selection cancelled.", 1800);
         cleanupSelection();
       }
@@ -468,7 +452,7 @@
     announce("Selection started. Drag to select. Esc to cancel.", 1800);
   }
 
-  // Remove overlays and listeners on page unload/navigation
+
   function cleanupOnUnload() {
     removeAllOverlays();
     if (shadowHost && shadowHost.parentNode) shadowHost.parentNode.removeChild(shadowHost);
@@ -483,16 +467,15 @@
   window.addEventListener('beforeunload', cleanupOnUnload);
   window.addEventListener('pagehide', cleanupOnUnload);
 
-  // Relaxed security: only block on truly unsupported pages (e.g., Chrome internal or restricted)
   function isSupportedPage() {
     const url = window.location.href;
-    // Only block chrome://, browser internal, or webstore. Allow file:// and most other URLs.
+ 
     return !(url.startsWith('chrome://') ||
       url.startsWith('chrome-extension://') ||
       url.startsWith('https://chrome.google.com/webstore'));
   }
 
-  // Listen for messages from popup/background
+
   window.addEventListener('message', async (e) => {
     if (!e.data) return;
     if (e.data.privacy_blur_screen__start_selection) {
@@ -513,13 +496,12 @@
     }
   }, false);
 
-  // On initial load, restore overlays if enabled
+
   (async () => {
     await loadPrefs();
     await restoreOverlays();
   })();
 
-  // Listen for storage changes to update color/density in real-time
   chrome.storage.onChanged.addListener((changes, namespace) => {
     if (namespace === 'local') {
       let needsUpdate = false;
@@ -541,7 +523,6 @@
     }
   });
 
-  // Expose for manual QA (window.PrivacyBlurScreen)
   window.PrivacyBlurScreen = {
     startSelectionMode,
     removeAllOverlays,
