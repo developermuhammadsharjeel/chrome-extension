@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Privacy_Blur_screen</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <main>
+    <div class="header-container">
+      <h1 id="title" tabindex="0">Privacy_Blur_screen</h1>
+      <button id="minimize-btn" aria-label="Minimize extension popup" title="Minimize">−</button>
+    </div>
+    <div id="actions">
+      <button id="select-blur" aria-label="Select area to blur" title="Draw a rectangle on the page to blur that region" tabindex="0">
+        Select Blur Area
+      </button>
+      <button id="remove-all" aria-label="Remove all blur overlays" title="Remove every active blurred area" tabindex="0">
+        Remove All Blurred_Area
+      </button>
+    </div>
+    <details id="settings">
+      <summary>Settings</summary>
+      <label>
+        <input type="checkbox" id="persist-overlays">
+        Persist overlays on page reload
+      </label>
+      <div class="color-setting">
+        <label for="blur-color">Blur color:</label>
+        <input type="color" id="blur-color" value="#ffffff">
+      </div>
+      <div class="density-setting">
+        <label for="blur-density">Color density:</label>
+        <input type="range" id="blur-density" min="10" max="100" value="13" step="1">
+        <span id="density-value">13%</span>
+      </div>
+    </details>
+    <div id="status" aria-live="polite"></div>
+    <footer>
+      <small>Alt+Shift+B: Quick toggle selection</small>
+    </footer>
+  </main>
+  <script src="popup.js"></script>
+</body>
+</html>
