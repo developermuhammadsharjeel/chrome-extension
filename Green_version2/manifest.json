@@ -28,8 +28,8 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "icons/close.svg",
-        "icons/lock.svg",
+        "icons/icons_close_Version2.svg",
+        "icons/icons_lock_Version2.svg",
         "libs/html2canvas.min.js"
       ],
       "matches": ["<all_urls>"]

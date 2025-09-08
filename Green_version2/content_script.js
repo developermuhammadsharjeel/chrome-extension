@@ -66,6 +66,13 @@
     const g = parseInt(hex.substring(2, 4), 16);
     const b = parseInt(hex.substring(4, 6), 16);
     
+    // Check for NaN values and fallback to white
+    if (isNaN(r) || isNaN(g) || isNaN(b)) {
+      console.warn('Invalid hex color components, using default white');
+      const safeAlpha = Math.max(0, Math.min(100, alpha || 30)) / 100;
+      return `rgba(255, 255, 255, ${safeAlpha})`;
+    }
+    
     // Ensure alpha is a valid number and convert to decimal
     const alphaValue = Math.max(0, Math.min(100, alpha || 30)) / 100;
     
