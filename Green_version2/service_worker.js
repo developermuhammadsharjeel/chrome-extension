@@ -1,5 +1,4 @@
 // service_worker.js -- background logic for Privacy_Blur_screen
-// Handles command shortcut, manages storage, and relays popup actions
 
 chrome.commands.onCommand.addListener(async (command) => {
   if (command === "toggle-selection") {
