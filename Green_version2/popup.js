@@ -1,5 +1,3 @@
-// popup.js handles UI logic and messaging to background for Privacy_Blur_screen
-
 const selectBtn = document.getElementById('select-blur');
 const removeAllBtn = document.getElementById('remove-all');
 const persistCheckbox = document.getElementById('persist-overlays');
@@ -9,12 +7,9 @@ const densityValueSpan = document.getElementById('density-value');
 const minimizeBtn = document.getElementById('minimize-btn');
 const statusDiv = document.getElementById('status');
 
-// Keep popup open until minimize button is clicked
 document.addEventListener('DOMContentLoaded', () => {
-  // This prevents the default popup behavior of closing when clicking outside
   chrome.action.setPopup({ popup: '' });
   
-  // Show the popup manually
   document.body.style.display = 'flex';
 });
 
@@ -63,7 +58,6 @@ removeAllBtn.onclick = async () => {
   }
 };
 
-// Notify content script of settings changes
 async function notifySettingsChanged() {
   try {
     const [tab] = await chrome.tabs.query({active: true, currentWindow: true});
@@ -79,7 +73,6 @@ async function notifySettingsChanged() {
   }
 }
 
-// Settings
 blurColorPicker.onchange = () => {
   chrome.storage.local.set({privacy_blur_color: blurColorPicker.value}, () => {
     setStatus("Blur color updated!", 'success');
@@ -118,7 +111,6 @@ async function restorePrefs() {
     }
     persistCheckbox.checked = !!prefs.privacy_blur_persist;
   } catch (err) {
-    // safe fallback
   }
 }
 restorePrefs();
