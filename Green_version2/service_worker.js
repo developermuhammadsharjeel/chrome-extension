@@ -1,4 +1,3 @@
-// service_worker.js -- background logic for Privacy_Blur_screen
 
 chrome.commands.onCommand.addListener(async (command) => {
   if (command === "toggle-selection") {
@@ -12,13 +11,12 @@ chrome.commands.onCommand.addListener(async (command) => {
         }
       });
     } catch (err) {
-      // Log error
+   
       await chrome.storage.local.set({privacy_blur_last_error: err.message});
     }
   }
 });
 
-// On install, set defaults
 chrome.runtime.onInstalled.addListener(() => {
   chrome.storage.local.set({
     privacy_blur_color: '#ffffff',
@@ -27,7 +25,6 @@ chrome.runtime.onInstalled.addListener(() => {
   });
 });
 
-// Keep popup open
 chrome.action.onClicked.addListener((tab) => {
   chrome.action.setPopup({ popup: 'popup.html' });
 });
